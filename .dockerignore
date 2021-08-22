@@ -1,0 +1,11 @@
+.git
+
+data
+storage
+docs
+backup
+plotting
+.idea
+
+**/__pycache__
+algo_arc.egg-info

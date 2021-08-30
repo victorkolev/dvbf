@@ -158,6 +158,7 @@ def main(args):
             tb_writer.add_scalar(k, v, e)
 
         logger.log(msg)
+        net.update_annealing()
 
         if e % args.checkpoint_every == 0:
             utils.save_model_state(save_dir, net)

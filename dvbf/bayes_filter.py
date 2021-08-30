@@ -21,6 +21,7 @@ class BayesFilter(nn.Module):
         input_dim,
         hidden_size,
         kl_weight,
+        annealing_steps=100,
     ):
         r"""
         Deep Variational Bayes Filter as described in [1]
@@ -37,6 +38,7 @@ class BayesFilter(nn.Module):
 
         hidden_size : universal hidden size for networks
         kl_weight : weight of KL divergence term in VAE loss
+        annealing_steps : number of steps before annealing rate becomes 1
 
         References:
             [1] Karl, Maximilian, et al. "Deep variational bayes filters: Unsupervised
@@ -86,6 +88,15 @@ class BayesFilter(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_size, latent_dim),
         )
+
+        self.anneal_rate = 1e-3
+        self.anneal_steps = annealing_steps
+
+    def update_annealing(self):
+        if self.anneal_rate > 1.0 - 1e-5:
+            self.anneal_rate = 1.0
+        else:
+            self.anneal_rate += 1.0 / self.anneal_steps
 
     def forward(self, observations, actions, logger=None):
         seq_len, batch_size = observations.shape[:2]
@@ -169,7 +180,9 @@ class TransitionModel(nn.Module):
 
 
 class LocallyLinearTransitionModel(TransitionModel):
-    def __init__(self, num_matrices, latent_dim, action_dim, noise_dim, hidden_size=16, **kwargs):
+    def __init__(
+        self, num_matrices, latent_dim, action_dim, noise_dim, hidden_size=16, **kwargs
+    ):
         super().__init__(
             latent_dim=latent_dim, action_dim=action_dim, noise_dim=noise_dim
         )

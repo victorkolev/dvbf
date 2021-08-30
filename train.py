@@ -72,6 +72,12 @@ def parse_arguments(args_to_parse):
         default=1.0,
         help="Weight of KL term.",
     )
+    parser.add_argument(
+        "--annealing-steps",
+        type=int,
+        default=0,
+        help="Number of annealing steps for KL weight."
+    )
     parser.add_argument("--num-epochs", type=int, default=50, help="Number of epochs.")
     parser.add_argument("--lr", type=float, default=0.0005, help="Learning rate.")
     parser.add_argument(
@@ -118,6 +124,7 @@ def main(args):
         input_dim=args.input_dim,
         hidden_size=args.hidden_size,
         kl_weight=args.kl_weight,
+        annealing_steps=args.annealing_steps,
     )
 
     model_state = utils.get_model_state(save_dir)

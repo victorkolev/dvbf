@@ -89,10 +89,16 @@ class BayesFilter(nn.Module):
             nn.Linear(hidden_size, latent_dim),
         )
 
-        self.anneal_rate = 1e-3
         self.anneal_steps = annealing_steps
+        if self.anneal_steps != 0:
+            self.anneal_rate = 1e-3
+            self.update_annealing = self._update_annealing
 
-    def update_annealing(self):
+        else:
+            self.anneal_rate = 1.
+            self.update_annealing = lambda *args: None
+
+    def _update_annealing(self):
         if self.anneal_rate > 1.0 - 1e-5:
             self.anneal_rate = 1.0
         else:
